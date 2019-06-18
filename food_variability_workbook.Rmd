@@ -1,0 +1,45 @@
+---
+title: "Food systems and Enviro Variability Review"
+author: "Jessica Gephart"
+date: "6/18/2019"
+output: html_document
+---
+
+## Load packages
+```{r, echo=FALSE}
+library(tidyverse)
+library(wosr)
+library(ggplot2)
+```
+
+## 
+```{r, echo=FALSE}
+# Must have IP-based access to WOS API or login/password
+SID <- auth(username = NULL, password = NULL)
+
+# Break up request
+base_search <- c('"climate variability" OR "climate shock" OR "food price shock" OR "shock propagation"')
+
+years <- rep(2008:2019, length(base_search))
+years <- sort(years)
+
+added_search <- c('"food production" OR "nutrition" OR "food supply chain" OR "food security" OR "nutrition security" OR "diet" OR "food access" OR "food availability"')
+           
+queries <- paste("TS = ((", base_search, ") AND (", added_search, ")) AND PY = ", sep = "")
+queries <- paste(queries, years, sep = "")
+
+names(queries) <- (paste("search", 1:length(queries), sep = ""))
+
+refs <- pull_wos_apply(queries, sid = SID)
+
+saveRDS(refs, file = "refs.rds")
+```
+
+
+```{r, echo=FALSE}
+# Convert list to dataframe
+df <- data.frame(publication = refs$publication)
+
+write.csv(df, "food_variability_refs_18Jun19.csv", row.names = FALSE)
+```
+
